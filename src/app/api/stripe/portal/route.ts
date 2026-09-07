@@ -2,11 +2,11 @@ import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
 import { getPlanInfo } from "@/lib/plan";
 import { stripe } from "@/lib/stripe";
-import { env } from "@/lib/env";
+import { getBaseUrlFromRequest } from "@/lib/url";
 
 export const dynamic = "force-dynamic";
 
-export async function POST() {
+export async function POST(request: Request) {
   const user = await getUser();
   if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -19,7 +19,7 @@ export async function POST() {
 
   const session = await stripe().billingPortal.sessions.create({
     customer: info.stripeCustomerId,
-    return_url: `${env.siteUrl}/pricing`,
+    return_url: `${getBaseUrlFromRequest(request)}/pricing`,
   });
 
   return NextResponse.json({ url: session.url });

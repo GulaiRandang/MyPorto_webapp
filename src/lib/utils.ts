@@ -26,3 +26,18 @@ export function formatCurrency(
 export function formatPercent(value: number, decimals = 1) {
   return `${value.toFixed(decimals)}%`;
 }
+
+/**
+ * Sanitises a post-login `?next=` value: only same-origin, absolute paths are
+ * allowed. Rejects `//host`, `/\host`, and anything with a scheme so a crafted
+ * link can't bounce a signed-in user to an external site.
+ */
+export function safeNext(
+  value: string | null | undefined,
+  fallback = "/",
+): string {
+  if (!value) return fallback;
+  if (value[0] !== "/") return fallback;
+  if (value[1] === "/" || value[1] === "\\") return fallback;
+  return value;
+}

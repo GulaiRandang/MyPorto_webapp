@@ -3,11 +3,13 @@ import { getUser } from "@/lib/auth";
 import { getPlanInfo } from "@/lib/plan";
 import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/server";
-import { env, serverEnv } from "@/lib/env";
+import { serverEnv } from "@/lib/env";
+import { getBaseUrlFromRequest } from "@/lib/url";
 
 export const dynamic = "force-dynamic";
 
-export async function POST() {
+export async function POST(request: Request) {
+  const baseUrl = getBaseUrlFromRequest(request);
   const user = await getUser();
   if (!user?.email) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -40,8 +42,8 @@ export async function POST() {
     client_reference_id: user.id,
     subscription_data: { metadata: { user_id: user.id } },
     allow_promotion_codes: true,
-    success_url: `${env.siteUrl}/pricing?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${env.siteUrl}/pricing?checkout=cancelled`,
+    success_url: `${baseUrl}/pricing?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${baseUrl}/pricing?checkout=cancelled`,
   });
 
   return NextResponse.json({ url: session.url });

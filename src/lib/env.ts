@@ -30,12 +30,11 @@ export const env = {
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     );
   },
-  /** Public base URL, used for Stripe redirect URLs. Defaults to localhost. */
-  get siteUrl() {
-    return process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-      "http://localhost:3000";
-  },
 };
+
+// The app's public origin is resolved per-request from headers — see
+// `src/lib/url.ts` (`getBaseUrl` / `getBaseUrlFromRequest`). `NEXT_PUBLIC_SITE_URL`
+// is only a fallback there and no longer read directly anywhere.
 
 /** Server-only secrets. Never import into Client Components. */
 export const serverEnv = {
